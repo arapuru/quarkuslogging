@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'io.quarkus'
-    id 'maven-publish'
 }
 
 repositories {
@@ -10,13 +9,10 @@ repositories {
 }
 
 dependencies {
-    implementation platform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
-    implementation 'io.quarkiverse.micrometer.registry:quarkus-micrometer-registry-datadog:3.4.1'
-    implementation 'io.quarkiverse.loggingjson:quarkus-logging-json:3.4.0'
-    implementation 'io.quarkus:quarkus-opentelemetry'
-    implementation 'io.quarkus:quarkus-jackson'
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     implementation 'io.quarkus:quarkus-rest'
-    implementation 'io.quarkus:quarkus-arc'
+    implementation 'org.acme:quarkuslogging:1.0.0-SNAPSHOT'
+    implementation 'io.quarkiverse.loggingjson:quarkus-logging-json:3.4.0'
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
 }
@@ -31,7 +27,6 @@ java {
 
 test {
     systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
-    jvmArgs "--add-opens", "java.base/java.lang=ALL-UNNAMED"
 }
 compileJava {
     options.encoding = 'UTF-8'
@@ -40,12 +35,4 @@ compileJava {
 
 compileTestJava {
     options.encoding = 'UTF-8'
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
 }
