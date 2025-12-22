@@ -1,0 +1,56 @@
+import io.quarkiverse.loggingjson.JsonGenerator;
+import io.quarkiverse.loggingjson.providers.StructuredArgument;
+
+import java.io.IOException;
+import java.time.Instant;
+
+public final class AppLogArgument implements StructuredArgument {
+
+    private final AppLog log;
+
+    public AppLogArgument(AppLog log) {
+        this.log = log;
+    }
+
+    @Override
+    public void writeTo(JsonGenerator jg) throws IOException {
+        // REQUIRED: start/end object because we fully own JSON
+        jg.writeStartObject();
+
+        writeInstant(jg, "timestamp", log.timestamp);
+        writeString(jg, "level", log.level);
+        writeString(jg, "message", log.message);
+
+        writeString(jg, "correlation_id", log.correlation_id);
+        writeString(jg, "environment", log.environment);
+        writeString(jg, "service", log.service);
+        writeString(jg, "tracepoint", log.tracepoint);
+
+        if (log.details != null) {
+            jg.writeObjectField("details", log.details);
+        }
+
+        writeString(jg, "payload", log.payload);
+
+        if (log.error != null) {
+            jg.writeObjectField("error", log.error);
+        }
+
+        if (log.metrics != null) {
+            jg.writeObjectField("metrics", log.metrics);
+        }
+
+        writeString(jg, "trace_id", log.trace_id);
+        writeString(jg, "span_id", log.span_id);
+
+        jg.writeEndObject();
+    }
+
+    private static void writeString(JsonGenerator jg, String k, String v) throws IOException {
+        if (v != null) jg.writeStringField(k, v);
+    }
+
+    private static void writeInstant(JsonGenerator jg, String k, Instant v) throws IOException {
+        if (v != null) jg.writeStringField(k, v.toString());
+    }
+}
