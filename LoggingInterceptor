@@ -1,0 +1,32 @@
+@Logged
+@Interceptor
+public class LoggingInterceptor {
+
+    @Inject
+    LogContext logContext;
+
+    @AroundInvoke
+    public Object around(InvocationContext ctx) throws Exception {
+
+        long startNs = System.nanoTime();
+        boolean success = true;
+
+        try {
+            return ctx.proceed();
+        } catch (Exception e) {
+            success = false;
+            logContext.put("error", Map.of(
+                "type", e.getClass().getName(),
+                "message", e.getMessage()
+            ));
+            throw e;
+        } finally {
+            long durationMs =
+                (System.nanoTime() - startNs) / 1_000_000;
+
+            logContext.put("processing_time_ms", durationMs);
+            logContext.put("success", success);
+            logContext.put("method", ctx.getMethod().getName());
+        }
+    }
+}
